@@ -3,11 +3,13 @@ import os
 from solver import Solver
 from data_loader import get_loader
 from torch.backends import cudnn
+import random
 
 def main(config):
     cudnn.benchmark = True
     if config.model_type not in ['U_Net','R2U_Net','AttU_Net','R2AttU_Net']:
         print('ERROR!! model_type should be selected in U_Net/R2U_Net/AttU_Net/R2AttU_Net')
+        print('Your input for model_type was %s'%config.model_type)
         return
 
     # Create directories if not exist
@@ -18,24 +20,38 @@ def main(config):
     config.result_path = os.path.join(config.result_path,config.model_type)
     if not os.path.exists(config.result_path):
         os.makedirs(config.result_path)
-     
+    
+    lr = random.random()*0.0005 + 0.0000005
+    augmentation_prob= random.random()*0.7
+    epoch = random.choice([100,150,200,250])
+    decay_ratio = random.random()*0.8
+    decay_epoch = int(epoch*decay_ratio)
 
+    config.augmentation_prob = augmentation_prob
+    config.num_epochs = epoch
+    config.lr = lr
+    config.num_epochs_decay = decay_epoch
+
+    print(config)
         
     train_loader = get_loader(image_path=config.train_path,
                             image_size=config.image_size,
                             batch_size=config.batch_size,
                             num_workers=config.num_workers,
-                            mode='train')
+                            mode='train',
+                            augmentation_prob=config.augmentation_prob)
     valid_loader = get_loader(image_path=config.valid_path,
                             image_size=config.image_size,
                             batch_size=config.batch_size,
                             num_workers=config.num_workers,
-                            mode='valid')
+                            mode='valid',
+                            augmentation_prob=0.)
     test_loader = get_loader(image_path=config.test_path,
                             image_size=config.image_size,
                             batch_size=config.batch_size,
                             num_workers=config.num_workers,
-                            mode='test')
+                            mode='test',
+                            augmentation_prob=0.)
 
     solver = Solver(config, train_loader, valid_loader, test_loader)
 
@@ -53,7 +69,7 @@ if __name__ == '__main__':
     
     # model hyper-parameters
     parser.add_argument('--image_size', type=int, default=224)
-    parser.add_argument('--t', type=int, default=2, help='t for Recurrent time of R2U_Net or R2AttU_Net')
+    parser.add_argument('--t', type=int, default=3, help='t for Recurrent step of R2U_Net or R2AttU_Net')
     
     # training hyper-parameters
     parser.add_argument('--img_ch', type=int, default=3)
@@ -65,6 +81,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=0.0002)
     parser.add_argument('--beta1', type=float, default=0.5)        # momentum1 in Adam
     parser.add_argument('--beta2', type=float, default=0.999)      # momentum2 in Adam    
+    parser.add_argument('--augmentation_prob', type=float, default=0.4)
 
     parser.add_argument('--log_step', type=int, default=2)
     parser.add_argument('--val_step', type=int, default=2)
@@ -81,5 +98,4 @@ if __name__ == '__main__':
     parser.add_argument('--cuda_idx', type=int, default=1)
 
     config = parser.parse_args()
-    print(config)
     main(config)

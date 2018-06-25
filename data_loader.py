@@ -10,7 +10,7 @@ from PIL import Image
 
 class ImageFolder(data.Dataset):
 	"""Load Variaty Chinese Fonts for Iterator. """
-	def __init__(self, root,image_size=224,mode='train'):
+	def __init__(self, root,image_size=224,mode='train',augmentation_prob=0.4):
 		"""Initializes image paths and preprocessing module."""
 		self.root = root
 		
@@ -20,6 +20,7 @@ class ImageFolder(data.Dataset):
 		self.image_size = image_size
 		self.mode = mode
 		self.RotationDegree = [0,90,180,270]
+		self.augmentation_prob = augmentation_prob
 		print("image count in {} path :{}".format(self.mode,len(self.image_paths)))
 
 	def __getitem__(self, index):
@@ -39,7 +40,7 @@ class ImageFolder(data.Dataset):
 		Transform.append(T.Resize((int(ResizeRange*aspect_ratio),ResizeRange)))
 		p_transform = random.random()
 
-		if (self.mode == 'train') and p_transform >= 0.4:
+		if (self.mode == 'train') and p_transform <= self.augmentation_prob:
 			RotationDegree = random.randint(0,3)
 			RotationDegree = self.RotationDegree[RotationDegree]
 			if (RotationDegree == 90) or (RotationDegree == 270):
@@ -94,10 +95,10 @@ class ImageFolder(data.Dataset):
 		"""Returns the total number of font files."""
 		return len(self.image_paths)
 
-def get_loader(image_path, image_size, batch_size, num_workers=2, mode='train'):
+def get_loader(image_path, image_size, batch_size, num_workers=2, mode='train',augmentation_prob=0.4):
 	"""Builds and returns Dataloader."""
 	
-	dataset = ImageFolder(root = image_path, image_size =image_size, mode=mode)
+	dataset = ImageFolder(root = image_path, image_size =image_size, mode=mode,augmentation_prob=augmentation_prob)
 	data_loader = data.DataLoader(dataset=dataset,
 								  batch_size=batch_size,
 								  shuffle=True,
