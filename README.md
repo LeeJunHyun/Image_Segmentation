@@ -30,7 +30,7 @@ https://arxiv.org/abs/1804.03999
 ![AttR2U-Net](/img/AttR2U-Net.png)
 
 ## Evaluation
-we just test the models with ISIC 2018 dataset. The dataset was split into three subsets, training set, validation set, and test set, which the proportion is 70%, 10% and 20% of the whole dataset, respectively. The entire dataset contains 2594 images where 1815 images were used
+we just test the models with [ISIC 2018 dataset](https://challenge2018.isic-archive.com/task1/training/). The dataset was split into three subsets, training set, validation set, and test set, which the proportion is 70%, 10% and 20% of the whole dataset, respectively. The entire dataset contains 2594 images where 1815 images were used
 for training, 259 for validation and 520 for testing models.
 
 ![evaluation](/img/Evaluation.png)
