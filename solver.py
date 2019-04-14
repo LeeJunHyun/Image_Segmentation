@@ -206,7 +206,7 @@ class Solver(object):
 
 					images = images.to(self.device)
 					GT = GT.to(self.device)
-					SR = self.unet(images)
+					SR = F.sigmoid(self.unet(images))
 					acc += get_accuracy(SR,GT)
 					SE += get_sensitivity(SR,GT)
 					SP += get_specificity(SR,GT)
@@ -270,7 +270,7 @@ class Solver(object):
 
 				images = images.to(self.device)
 				GT = GT.to(self.device)
-				SR = self.unet(images)
+				SR = F.sigmoid(self.unet(images))
 				acc += get_accuracy(SR,GT)
 				SE += get_sensitivity(SR,GT)
 				SP += get_specificity(SR,GT)
