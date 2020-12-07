@@ -51,10 +51,10 @@ class ImageFolder(data.Dataset):
 			Transform.append(T.RandomRotation((RotationRange,RotationRange)))
 			CropRange = random.randint(250,270)
 			Transform.append(T.CenterCrop((int(CropRange*aspect_ratio),CropRange)))
-			Transform = T.Compose(Transform)
+			Transformed = T.Compose(Transform)
 			
-			image = Transform(image)
-			GT = Transform(GT)
+			image = Transformed(image)
+			GT = Transformed(GT)
 
 			ShiftRange_left = random.randint(0,20)
 			ShiftRange_upper = random.randint(0,20)
@@ -71,19 +71,19 @@ class ImageFolder(data.Dataset):
 				image = F.vflip(image)
 				GT = F.vflip(GT)
 
-			Transform = T.ColorJitter(brightness=0.2,contrast=0.2,hue=0.02)
+			Transformed = T.ColorJitter(brightness=0.2,contrast=0.2,hue=0.02)
 
-			image = Transform(image)
+			image = Transformed(image)
 
 			Transform =[]
 
 
 		Transform.append(T.Resize((int(256*aspect_ratio)-int(256*aspect_ratio)%16,256)))
 		Transform.append(T.ToTensor())
-		Transform = T.Compose(Transform)
+		Transformed = T.Compose(Transform)
 		
-		image = Transform(image)
-		GT = Transform(GT)
+		image = Transformed(image)
+		GT = Transformed(GT)
 
 		Norm_ = T.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 		image = Norm_(image)
